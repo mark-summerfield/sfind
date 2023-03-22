@@ -32,7 +32,8 @@ func processPath(index int, config *config) {
 }
 
 func skipFolder(path string, config *config) bool {
-	if strings.HasPrefix(filepath.Base(path), ".") { // skip hidden
+	base := filepath.Base(path)
+	if base != "." && strings.HasPrefix(base, ".") { // skip hidden
 		return true
 	}
 	path = filepath.ToSlash(path)
