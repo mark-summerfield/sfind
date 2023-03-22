@@ -47,11 +47,11 @@ func skipFolder(path string, config *config) bool {
 }
 
 func validFilename(path string, info fs.FileInfo, config *config) bool {
-	base := filepath.Base(path)
-	if strings.HasPrefix(base, ".") { // skip hidden
+	if config.from.After(info.ModTime()) {
 		return false
 	}
-	if config.from.After(info.ModTime()) {
+	base := filepath.Base(path)
+	if strings.HasPrefix(base, ".") { // skip hidden
 		return false
 	}
 	for _, glob := range config.globs {
