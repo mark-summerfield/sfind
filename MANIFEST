@@ -1,5 +1,9 @@
 sfind.go
+config.go
+process.go
 
 README.md
+
+go.mod
 
 st.sh
