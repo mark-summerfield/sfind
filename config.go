@@ -26,7 +26,9 @@ func getConfig() *config {
 		parser.OnError(err)
 	}
 	config := &config{from: time.UnixMilli(0)}
-	updateFrom(parser, fromOpt.Value(), config)
+	if fromOpt.Given() {
+		updateFrom(parser, fromOpt.Value(), config)
+	}
 	updateGlobs(parser, globsOpt.Value(), suffixesOpt.Value(), config)
 	config.excludes = excludeOpt.Value()
 	if len(parser.Positionals) > 0 {
