@@ -20,11 +20,10 @@ func main() {
 		var wg sync.WaitGroup
 		for i := 0; i < len(config.paths); i++ {
 			wg.Add(1)
-			i := i
-			go func() {
+			go func(index int) {
 				defer wg.Done()
-				processPath(i, config)
-			}()
+				processPath(index, config)
+			}(i)
 		}
 		wg.Wait()
 	}
