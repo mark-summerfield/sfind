@@ -44,7 +44,7 @@ func makeParser() *clip.Parser {
 	parser := clip.NewParserVersion(Version)
 	parser.PositionalHelp = "Paths to search [default: .]"
 	parser.PositionalCount = clip.ZeroOrMorePositionals
-	_ = parser.SetPositionalVarName("PATH")
+	parser.MustSetPositionalVarName("PATH")
 	parser.LongDesc = longDesc
 	parser.EndDesc = endDesc
 	return &parser
