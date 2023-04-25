@@ -18,6 +18,7 @@ func getConfig() *config {
 	fromOpt := parser.Str("from", fromDesc, "")
 	suffixesOpt := parser.Strs("suffixes", suffixesDesc)
 	globsOpt := parser.Strs("glob", globsDesc)
+	containsOpt := parser.Str("contains", containsDesc, "")
 	excludeOpt := parser.Strs("exclude", excludeDesc)
 	excludeOpt.SetShortName('x')
 	debugOpt := parser.Flag("debug", "print config and quit")
@@ -29,7 +30,11 @@ func getConfig() *config {
 	if fromOpt.Given() {
 		updateFrom(parser, fromOpt.Value(), config)
 	}
-	updateGlobs(parser, globsOpt.Value(), suffixesOpt.Value(), config)
+	globs := globsOpt.Value()
+	if containsOpt.Given() {
+		globs = append(globs, fmt.Sprintf("*%s*", containsOpt.Value()))
+	}
+	updateGlobs(parser, globs, suffixesOpt.Value(), config)
 	config.excludes = excludeOpt.Value()
 	if len(parser.Positionals) > 0 {
 		config.paths = parser.Positionals
@@ -120,10 +125,12 @@ const (
 	fromDesc = "The earliest date to search from. " +
 		"Can use 'today' (or 0) or 'yesterday' (or 1) or an int (up " +
 		"to that many days ago), or an ISO8601 format date " +
-		"(e.g., 2023-05-22) [default: any date]"
+		"(e.g., 2023-05-22) [default: any date]."
 	suffixesDesc = "The file suffixes to match (e.g., py pyw) " +
-		"[default: any file]"
+		"[default: any file]."
 	globsDesc = "The file globs to match (e.g., '*.py' '*.pyw') " +
-		"[default: any file]"
-	excludeDesc = "Paths to exclude [default: none]"
+		"[default: any file]."
+	containsDesc = "The file names that contain CONTAINS (shorthand " +
+		"for -g '*CONTAINS*' --)."
+	excludeDesc = "Paths to exclude [default: none]."
 )
