@@ -14,7 +14,7 @@ import (
 )
 
 func getConfig() *config {
-	const comma = ","
+	const sep = ","
 	parser := makeParser()
 	extensionOpt := parser.Str("extension", extensionDesc, "")
 	containsOpt := parser.Str("contains", containsDesc, "")
@@ -34,20 +34,20 @@ func getConfig() *config {
 	}
 	globs := make([]string, 0)
 	if globsOpt.Given() {
-		globs = strings.Split(globsOpt.Value(), comma)
+		globs = strings.Split(globsOpt.Value(), sep)
 	}
 	if containsOpt.Given() {
-		for _, contains := range strings.Split(containsOpt.Value(), comma) {
+		for _, contains := range strings.Split(containsOpt.Value(), sep) {
 			globs = append(globs, fmt.Sprintf("*%s*", contains))
 		}
 	}
 	extension := make([]string, 0)
 	if extensionOpt.Given() {
-		extension = strings.Split(extensionOpt.Value(), comma)
+		extension = strings.Split(extensionOpt.Value(), sep)
 	}
 	updateGlobs(parser, globs, extension, config)
 	if excludeOpt.Given() {
-		config.excludes = strings.Split(excludeOpt.Value(), comma)
+		config.excludes = strings.Split(excludeOpt.Value(), sep)
 	}
 	if len(parser.Positionals) > 0 {
 		config.paths = parser.Positionals
