@@ -32,6 +32,9 @@ func processPath(index int, config *config) {
 }
 
 func skipFolder(path string, config *config) bool {
+	if config.casefold {
+		path = strings.ToLower(path)
+	}
 	base := filepath.Base(path)
 	if base != "." && strings.HasPrefix(base, ".") { // skip hidden
 		return true
@@ -39,6 +42,9 @@ func skipFolder(path string, config *config) bool {
 	path = filepath.ToSlash(path)
 	parts := gset.New(strings.Split(path, "/")...)
 	for _, name := range config.excludes {
+		if config.casefold {
+			name = strings.ToLower(name)
+		}
 		if parts.Contains(name) {
 			return true
 		}
@@ -54,7 +60,13 @@ func validFilename(path string, info fs.FileInfo, config *config) bool {
 	if strings.HasPrefix(base, ".") { // skip hidden
 		return false
 	}
+	if config.casefold {
+		base = strings.ToLower(base)
+	}
 	for _, glob := range config.globs {
+		if config.casefold {
+			glob = strings.ToLower(glob)
+		}
 		if matched, _ := filepath.Match(glob, base); matched {
 			return true
 		}

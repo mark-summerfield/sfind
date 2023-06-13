@@ -16,12 +16,13 @@ import (
 func getConfig() *config {
 	const comma = ","
 	parser := makeParser()
-	suffixesOpt := parser.Str("suffixes", suffixesDesc, "")
+	extensionOpt := parser.Str("extension", extensionDesc, "")
 	containsOpt := parser.Str("contains", containsDesc, "")
 	globsOpt := parser.Str("glob", globsDesc, "")
 	fromOpt := parser.Str("from", fromDesc, "")
 	excludeOpt := parser.Str("exclude", excludeDesc, "")
 	excludeOpt.SetShortName('x')
+	casefoldOpt := parser.Flag("ignorecase", casefoldDesc)
 	debugOpt := parser.Flag("debug", "print config and quit")
 	debugOpt.Hide()
 	if err := parser.Parse(); err != nil {
@@ -40,11 +41,11 @@ func getConfig() *config {
 			globs = append(globs, fmt.Sprintf("*%s*", contains))
 		}
 	}
-	suffixes := make([]string, 0)
-	if suffixesOpt.Given() {
-		suffixes = strings.Split(suffixesOpt.Value(), comma)
+	extension := make([]string, 0)
+	if extensionOpt.Given() {
+		extension = strings.Split(extensionOpt.Value(), comma)
 	}
-	updateGlobs(parser, globs, suffixes, config)
+	updateGlobs(parser, globs, extension, config)
 	if excludeOpt.Given() {
 		config.excludes = strings.Split(excludeOpt.Value(), comma)
 	}
@@ -53,6 +54,7 @@ func getConfig() *config {
 	} else {
 		config.paths = []string{"."}
 	}
+	config.casefold = casefoldOpt.Value()
 	config.debug = debugOpt.Value()
 	return config
 }
@@ -92,10 +94,10 @@ func updateFrom(parser *clip.Parser, text string, config *config) {
 	}
 }
 
-func updateGlobs(parser *clip.Parser, globs, suffixes []string,
+func updateGlobs(parser *clip.Parser, globs, extension []string,
 	config *config) {
-	if len(suffixes) > 0 {
-		for _, suffix := range suffixes {
+	if len(extension) > 0 {
+		for _, suffix := range extension {
 			globs = append(globs, fmt.Sprintf("*.%s", suffix))
 		}
 	}
@@ -119,12 +121,7 @@ type config struct {
 	globs    []string
 	excludes []string
 	paths    []string
-}
-
-func (me config) String() string {
-	return fmt.Sprintf("from=%s\nglobs=[%s]\nexcludes=[%s]\npaths=[%s]",
-		me.from, strings.Join(me.globs, " "),
-		strings.Join(me.excludes, " "), strings.Join(me.paths, " "))
+	casefold bool
 }
 
 const (
@@ -138,12 +135,14 @@ const (
 		"Can use 'today' (or 0) or 'yesterday' (or 1) or an int (up " +
 		"to that many days ago), or an ISO8601 format date " +
 		"(e.g., 2023-05-22) [default: any date]."
-	suffixesDesc = "The comma-separated file suffixes to match (e.g., " +
+	extensionDesc = "The comma-separated file extension to match (e.g., " +
 		"py,pyw) [default: any file]."
 	globsDesc = "The comma-separated file globs to match (e.g., " +
 		"'*.tcl,*.tm') [default: any file]."
 	containsDesc = "The comma-separated file names that contain CONTAINS " +
-		"(e.g., -c 'readme,README' is the same as " +
-		"-g '*readme*,*README*')."
-	excludeDesc = "The comma-separated paths to exclude [default: none]."
+		"(e.g., -c readme,install is the same as " +
+		"-g '*readme*,*install*')."
+	excludeDesc  = "The comma-separated paths to exclude [default: none]."
+	casefoldDesc = "Ignore case when comparing names [default: case-" +
+		"sensitive.]"
 )
