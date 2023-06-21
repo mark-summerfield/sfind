@@ -32,7 +32,7 @@ func getConfig() *config {
 	if fromOpt.Given() {
 		updateFrom(parser, fromOpt.Value(), config)
 	}
-	globs := make([]string, 0)
+	globs := []string{}
 	if globsOpt.Given() {
 		globs = strings.Split(globsOpt.Value(), sep)
 	}
@@ -41,7 +41,7 @@ func getConfig() *config {
 			globs = append(globs, fmt.Sprintf("*%s*", contains))
 		}
 	}
-	extension := make([]string, 0)
+	extension := []string{}
 	if extensionOpt.Given() {
 		extension = strings.Split(extensionOpt.Value(), sep)
 	}
